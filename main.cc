@@ -45,11 +45,14 @@ GLFWwindow* createWindow(ivec2 windowsize){
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
-	window = glfwCreateWindow(windowsize.x, windowsize.y, "window!", NULL, NULL);
+	window = glfwCreateWindow(windowsize.x, windowsize.y, "float", NULL, NULL);
 
 	// check if window has been created
-	if (!window){ glfwTerminate(); exit(EXIT_FAILURE); }
-	else cout<<OK"GLFW: window succesfully created"<<endl;
+	if (!window){ 
+		cout<<FAIL"GLFW failed to create a window\n";
+		glfwTerminate();
+		exit(EXIT_FAILURE); }
+	else cout<<OK"GLFW window created"<<endl;
 
 	// assign context to current thread
 	glfwMakeContextCurrent(window);
@@ -72,96 +75,117 @@ void uniform_set(GLint loc,glm::vec3 data){
 }
 
 int main(){
-	if (!glfwInit()) exit(EXIT_FAILURE);
-	GLFWwindow* window = createWindow(ivec2(800,600));
+	// initialize glfw
+	if (!glfwInit()){
+		cout<<FAIL"GLFW failed to initialize\n";
+		exit(EXIT_FAILURE);
+	}
+	else cout<<OK"GLFW initialized\n";
 
-	ivec2 screensize = getScreenSize(window);
+	GLFWwindow* window = createWindow(ivec2(800,600));
 
 	// initialise GLEW
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (GLEW_OK != err){
-		cerr<<FAIL"GLEW: "<<glewGetErrorString(err)<<endl;
+		cerr<<FAIL"GLEW "<<glewGetErrorString(err)<<endl;
 		exit(EXIT_FAILURE);
-	} else cout<<OK"GLEW: succesfully initialized"<<endl;
+	} else cout<<OK"GLEW initialized\n";
 
 	// set GL states
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 	
 	std::vector<GLfloat> vertices = {
-		1.0f, -1.0f, 1.0f, 
-		1.0f, -1.0f, 1.0f, 
-		1.0f, 1.0f, 1.0f, 
-		1.0f, 1.0f, 1.0f, 
-		1.0f, -1.0f, -1.0f, 
-		1.0f, -1.0f, -1.0f, 
-		1.0f, 1.0f, -1.0f, 
-		1.0f, 1.0f, -1.0f 
+	    // front
+	    -1.0, -1.0,  1.0,
+	     1.0, -1.0,  1.0,
+	     1.0,  1.0,  1.0,
+	    -1.0,  1.0,  1.0,
+	    // back
+	    -1.0, -1.0, -1.0,
+	     1.0, -1.0, -1.0,
+	     1.0,  1.0, -1.0,
+	    -1.0,  1.0, -1.0
 	};
 
 	std::vector<GLushort> indices = {
-		0, 1, 2, 2, 3, 0, 
-		3, 2, 6, 6, 7, 3, 
-		7, 6, 5, 5, 4, 7, 
-		4, 0, 3, 3, 7, 4, 
-		0, 1, 5, 5, 4, 0,
-		1, 5, 6, 6, 2, 1 
-	};	
+		// front
+		0, 1, 2,
+		2, 3, 0,
+		// top
+		3, 2, 6,
+		6, 7, 3,
+		// back
+		7, 6, 5,
+		5, 4, 7,
+		// bottom
+		4, 5, 1,
+		1, 0, 4,
+		// left
+		4, 0, 3,
+		3, 7, 4,
+		// right
+		1, 5, 6,
+		6, 2, 1
+	};
 
+	// load shaders
 	GLuint program = make_shader(vert_src, frag_src);
-
 	if(!program) return 1;
 	glUseProgram(program);
 
 	// set color
 	GLint color_uniform = glGetUniformLocation(program,"color");
 	if(color_uniform==-1){
-		std::cout<<FAIL"failed to find uniform \"color\" in shader program\n";
-	}
+		std::cout<<FAIL
+			"failed to find uniform \"color\" in shader program\n";
+	}else cout<<OK"found uniform \"color\"\n";
 	uniform_set(color_uniform, glm::vec3(0.7,0.1,0.5));
 	
 	// set modelview matrix
 	GLint modelview_uniform = glGetUniformLocation(program,"modelview");
 	if(modelview_uniform==-1){
-		std::cout<<FAIL"failed to find uniform \"modelview\" in shader program\n";
-	}
-	uniform_set(modelview_uniform, glm::mat4(0.2,0  ,0  ,0,
-											 0  ,0.2,0  ,0,
-											 0  ,0  ,0.2,-0.5,
-											 0  ,0  ,0  ,1));
+		std::cout<<FAIL
+			"failed to find uniform \"modelview\" in shader program\n";
+	}else cout<<OK"found uniform \"modelview\"\n";
 
 	// set projection matrix
 	GLint projection_uniform = glGetUniformLocation(program,"projection");
 	if(projection_uniform==-1){
-		std::cout<<FAIL"failed to find uniform \"projection\" in shader program\n";
-	}
+		std::cout<<FAIL
+			"failed to find uniform \"projection\" in shader program\n";
+	}else cout<<OK"found uniform \"projection\"\n";
 	/*uniform_set(projection_uniform, glm::perspectiveFov(60.f,
 													 (float)screensize.x,
 													 (float)screensize.y,
 													 0.01f,
 													 100.f));
 	*/
-
-	uniform_set(projection_uniform, glm::ortho(-1,1,-1,1));
+	uniform_set(projection_uniform, glm::mat4(1,0,0,0,
+											  0,1,0,0,
+											  0,0,0,0,
+											  0,0,0,1));
 
 	object o = create_object( vertices, indices );
 
 	float x=0;
+	cout<<INFO"entering main loop\n";
 	while(true){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 model = glm::translate(glm::mat4(),vec3(0,0,-0.5))
-						* glm::rotate(glm::mat4(),x,vec3(0,1,0))
+		glm::mat4 model = glm::translate(glm::mat4(),glm::vec3(0,0,-0.5))
+						* glm::rotate(glm::mat4(),x,
+								glm::normalize(vec3(0,1,0.5)))
 						* glm::scale(mat4(),vec3(0.2,0.2,0.2));
 
 		uniform_set(modelview_uniform, model);
 
 		draw(o);
 		
-		glfwSwapBuffers(window);
-		x+=0.001;
+		glfwSwapBuffers(window); // blocking when window is visible (under X)
+		x+=0.01;
 	}
 	
 }

@@ -7,6 +7,7 @@
 #include <vector>
 
 // REMEMBER: these buffers are all located in graphics memory!
+//           the GLuint's are handles to those buffers.
 
 // NOTE ON THE OPENGL GENERIC BUFFER FUNCTIONS
 // Ok, so buffers are a little wierd in openGL.
@@ -20,7 +21,7 @@ struct object{
 	GLuint vbo;
 	GLuint ibo;
 	GLuint vao;
-	GLuint nr_of_indices;
+	unsigned short nr_of_indices;
 };
 
 object create_object(const std::vector<GLfloat> vertices,
@@ -43,7 +44,7 @@ object create_object(const std::vector<GLfloat> vertices,
 	// since we don't modify the vertices once we have uploaded them, 
 	// we use GL_STATIC_DRAW.
 	glBufferData(GL_ARRAY_BUFFER,
-				 vertices.size() * sizeof(GLushort),
+				 vertices.size() * sizeof(GLfloat),
 				 &vertices[0],
 				 GL_STATIC_DRAW);
  

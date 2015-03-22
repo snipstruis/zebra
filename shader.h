@@ -15,12 +15,12 @@ static bool compile_status(GLuint shader){
 }
 
 static void shader_source(GLuint shader, std::string src){
-	const GLint len = src.size();
+	const GLint len = GLint(src.size());
 	const char *cstr = src.c_str();
 	glShaderSource(shader, 1, &cstr, &len);	
 }
 
-static std::string get_compile_error(GLint shader){
+static std::string get_compile_error(GLuint shader){
 	GLint log_len;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
 
@@ -79,7 +79,7 @@ GLuint make_shader(std::string vert_src, std::string frag_src){
 
 
 	//// STEP 3: linking the shaders together into a program	
-	GLint prog = glCreateProgram();
+	GLuint prog = glCreateProgram();
 	glAttachShader(prog,vert_o);
 	glAttachShader(prog,frag_o);
 	glLinkProgram(prog);
