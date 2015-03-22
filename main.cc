@@ -95,40 +95,26 @@ int main(){
 	// set GL states
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	//glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT);
 	
 	std::vector<GLfloat> vertices = {
-	    // front
-	    -1.0, -1.0,  1.0,
-	     1.0, -1.0,  1.0,
-	     1.0,  1.0,  1.0,
-	    -1.0,  1.0,  1.0,
-	    // back
-	    -1.0, -1.0, -1.0,
-	     1.0, -1.0, -1.0,
-	     1.0,  1.0, -1.0,
-	    -1.0,  1.0, -1.0
+		-1.0,-1.0, 1.0,
+         1.0,-1.0, 1.0,
+         1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
+        -1.0,-1.0,-1.0,
+         1.0,-1.0,-1.0,
+         1.0, 1.0,-1.0,
+        -1.0, 1.0,-1.0
 	};
 
 	std::vector<GLushort> indices = {
-		// front
-		0, 1, 2,
-		2, 3, 0,
-		// top
-		3, 2, 6,
-		6, 7, 3,
-		// back
-		7, 6, 5,
-		5, 4, 7,
-		// bottom
-		4, 5, 1,
-		1, 0, 4,
-		// left
-		4, 0, 3,
-		3, 7, 4,
-		// right
-		1, 5, 6,
-		6, 2, 1
+		0, 1, 2,  2, 3, 0,
+        3, 2, 6,  6, 7, 3,
+        7, 6, 5,  5, 4, 7,
+        4, 0, 3,  3, 7, 4,
+        0, 1, 5,  5, 4, 0,
+        1, 5, 6,  6, 2, 1
 	};
 
 	// load shaders
@@ -157,16 +143,8 @@ int main(){
 		std::cout<<FAIL
 			"failed to find uniform \"projection\" in shader program\n";
 	}else cout<<OK"found uniform \"projection\"\n";
-	/*uniform_set(projection_uniform, glm::perspectiveFov(60.f,
-													 (float)screensize.x,
-													 (float)screensize.y,
-													 0.01f,
-													 100.f));
-	*/
-	uniform_set(projection_uniform, glm::mat4(1,0,0,0,
-											  0,1,0,0,
-											  0,0,0,0,
-											  0,0,0,1));
+
+	uniform_set(projection_uniform, glm::perspective(1.f,4.f/3.f,0.1f,100.f));
 
 	object o = create_object( vertices, indices );
 
@@ -175,18 +153,19 @@ int main(){
 	while(true){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 model = glm::translate(glm::mat4(),glm::vec3(0,0,-0.5))
+		glm::mat4 model = glm::translate(glm::mat4(),glm::vec3(0,0,-2.f))
 						* glm::rotate(glm::mat4(),x,
-								glm::normalize(vec3(0,1,0.5)))
+								glm::normalize(vec3(1,1,-1)))
 						* glm::scale(mat4(),vec3(0.2,0.2,0.2));
 
 		uniform_set(modelview_uniform, model);
 
-		draw(o);
+		draw_object(o);
 		
 		glfwSwapBuffers(window); // blocking when window is visible (under X)
 		x+=0.01;
 	}
-	
+
+	destroy_object(o);
 }
 

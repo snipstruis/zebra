@@ -87,13 +87,13 @@ object create_object(const std::vector<GLfloat> vertices,
 	return o;
 }
 
-void destroy(object o){
+void destroy_object(object o){
 	glDeleteBuffers(1,&o.vbo);
 	glDeleteBuffers(1,&o.ibo);
 	glDeleteVertexArrays(1,&o.vao);	
 }
 
-void draw(object o){
+void draw_object(object o){
 	glBindVertexArray(o.vao);
 	glDrawElements(GL_TRIANGLES,
 				   o.nr_of_indices,
