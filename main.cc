@@ -12,32 +12,6 @@
 using namespace std;
 using namespace glm;
 
-std::string vert_src =
-	"#version 140\n"
-	"uniform mat4 modelview;\n"
-	"uniform mat4 projection;\n"
-	"in vec3 vertex;\n"
-	"out vec3 pos;\n"
-	"void main(void) {\n"
-	"	gl_Position = projection * modelview * vec4(vertex,1);\n"
-	"	vec4 pos4 = modelview * vec4(vertex,1);\n"
-	"	pos = pos4.xyz;\n"
-	"}\n";
-
-std::string frag_src =
-	"#version 140\n"
-	"uniform vec3 color;\n"
-	"in  vec3 pos;\n"
-	"out vec4 fragColor;\n"
-	"vec3 lighting(const vec3 normal, const vec3 lightangle){\n"
-	"	return vec3(acos(dot(normal,lightangle)));\n"
-	"}\n"
-	"void main(){\n"
-	"	vec3 normal = normalize(cross(dFdx(pos), dFdy(pos)));\n"
-	"	vec3 lightangle = normalize(vec3(1.0,1.0,1.0));\n"
-	"	fragColor = vec4(color*lighting(normal,lightangle),1.0);\n"
-	"}\n";
-
 GLFWwindow* createWindow(ivec2 windowsize){
 	GLFWwindow* window;
 
@@ -74,7 +48,14 @@ void uniform_set(GLint loc,glm::vec3 data){
 	glUniform3f(loc,data.x,data.y,data.z);
 }
 
-int main(){
+int main(int argc, char** argv){
+	if(argc!=3){
+		cout<<FAIL"usage: "<<argv[0]<<" shader.vert shader.frag\n";
+		return 1;
+	}
+	std::string vert_src = read_file(argv[1]);
+	std::string frag_src = read_file(argv[2]);
+
 	// initialize glfw
 	if (!glfwInit()){
 		cout<<FAIL"GLFW failed to initialize\n";

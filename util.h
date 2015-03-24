@@ -24,4 +24,31 @@ glm::ivec2 getScreenSize(GLFWwindow* window){
 	return t;
 }
 
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <iostream>
+std::string read_file(char* filename){
+	int fd = open(filename, O_RDONLY);
+	if(!fd){
+		std::cout<<FAIL"failed to open file "<<BLU
+			<<filename<<CLR"\n";
+		exit(1);
+	}
+	struct stat file_stat;
+	if(fstat(fd,&file_stat)<0){
+		std::cout<<FAIL"failed to get file status on "<<BLU
+			<<filename<<CLR"\n";
+		exit(1);
+	}
+	auto filesize = file_stat.st_size;
+	std::string str(filesize, 0);
+	if(read(fd, &str[0], filesize)<0){
+		std::cout<<FAIL"failed to read from file "<<BLU
+			<<filename<<CLR"\n";
+		exit(1);
+	}
+	return str;
+}
 
