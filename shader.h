@@ -24,15 +24,17 @@ static std::string get_compile_error(GLuint shader){
 	GLint log_len;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
 
-	GLchar* log_txt = new GLchar[log_len];
+	std::string log_txt(log_len,0);
+
 	glGetShaderInfoLog(shader, log_len, &log_len, &log_txt[0]);
-		
-	return std::string(log_txt);
+	
+	return log_txt;
 }
 
 GLuint make_shader(std::string vert_src, std::string frag_src){
 	//// STEP 1: compiling the vertex shader
-	// create empty vertex shader
+	// create empty vertex shader, according to documentation, must be nonzero
+	// so we'll return zero to indicate error
 	GLuint vert_o = glCreateShader(GL_VERTEX_SHADER);
 	
 	// fill shader with source code
@@ -89,7 +91,7 @@ GLuint make_shader(std::string vert_src, std::string frag_src){
 	glDeleteShader(vert_o);
 	glDetachShader(prog,frag_o);
 	glDeleteShader(frag_o);
-	
+
 	return prog;
 }
 

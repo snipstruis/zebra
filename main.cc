@@ -167,5 +167,7 @@ int main(){
 	}
 
 	destroy_object(o);
+	glUseProgram(0);
+	glDeleteProgram(program);
 }
 
