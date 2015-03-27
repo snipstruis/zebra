@@ -7,10 +7,13 @@
 #include "util.h" // colors and getScreenSize
 #include "object.h" 
 #include "shader.h"
+#include "phisx.h" // to store the orientation
 
 #include <iostream> // cout endl
 using namespace std;
 using namespace glm;
+using namespace std::chrono;
+
 
 GLFWwindow* createWindow(ivec2 windowsize){
 	GLFWwindow* window;
@@ -98,6 +101,17 @@ int main(int argc, char** argv){
         1, 5, 6,  6, 2, 1
 	};
 
+	std::vector<float> locations_of_circles = {
+		-1.0,-1.0, 1.0,
+         1.0,-1.0, 1.0,
+         1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
+        -1.0,-1.0,-1.0,
+         1.0,-1.0,-1.0,
+         1.0, 1.0,-1.0,
+        -1.0, 1.0,-1.0
+	};
+
 	// load shaders
 	GLuint program = make_shader(vert_src, frag_src);
 	if(!program) return 1;
@@ -126,23 +140,59 @@ int main(int argc, char** argv){
 	}else cout<<OK"found uniform \"projection\"\n";
 
 	uniform_set(projection_uniform, glm::perspective(1.f,4.f/3.f,0.1f,100.f));
-
 	object o = create_object( vertices, indices );
+	
+	uniform_set(projection_uniform, glm::perspective(1.f,4.f/3.f,0.1f,100.f));
+	object g = create_object( vertices, indices );
 
 	float x=0;
 	cout<<INFO"entering main loop\n";
+	
+	orientation ori;
+	orientation_init(ori);
+	
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
+
+	auto previous = high_resolution_clock::now();
+
+	glm::mat4 model;
+
+	addCircleGrid(locations_of_circles, 15, 10, 100); // fils the map with a grid of objects so you can see that you're moving.
+
 	while(true){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 model = glm::translate(glm::mat4(),glm::vec3(0,0,-2.f))
-						* glm::rotate(glm::mat4(),x,
-								glm::normalize(vec3(1,1,-1)))
-						* glm::scale(mat4(),vec3(0.2,0.2,0.2));
+		model = glm::translate(glm::mat4(),glm::vec3(0,-0.5f,-1.f))
+					* glm::rotate(glm::mat4(),0.0f,
+							glm::normalize(vec3(1,1,-1)))
+					* glm::scale(mat4(),vec3(0.1,0.1,0.1));
 
 		uniform_set(modelview_uniform, model);
 
 		draw_object(o);
-		
+
+		auto current = high_resolution_clock::now();
+		auto elapsed = duration_cast<microseconds>(current-previous);
+		ori.time_of_last_loop = elapsed.count() / 1000000.0f;
+		previous = current;
+
+		glfwPollEvents();
+		getInput(window, ori);
+		glfwSwapInterval(1);
+
+		for(int i = 0; i < locations_of_circles.size()/3; i++){
+			model =	glm::rotate(glm::mat4(),0.0f,
+								glm::normalize(vec3(1,1,0)))
+						* glm::translate(glm::mat4(),glm::vec3(	-ori.position_x + locations_of_circles[i*3],
+																 ori.position_y + locations_of_circles[i*3+1],
+																-ori.position_z + locations_of_circles[i*3+2]))
+						* glm::scale(mat4(),vec3(0.1,0.1,0.1));
+	
+			uniform_set(modelview_uniform, model);
+			
+			draw_object(g);
+		}
+
 		glfwSwapBuffers(window); // blocking when window is visible (under X)
 		x+=0.01;
 	}
