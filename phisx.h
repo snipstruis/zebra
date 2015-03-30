@@ -3,13 +3,16 @@
 #include "util.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <iostream>
 #include <chrono>
 #include <cmath>
 
 using namespace std;
 
-struct orientation{
+#define PI 3.14159265358979323846264338327950288419716939937510 
+
+struct global_position_of_plane{
 	float rotation_x;
 	float rotation_y;
 	float rotation_z;
@@ -26,7 +29,7 @@ struct orientation{
 
 };
 
-void orientation_init(orientation &ori){
+void global_position_of_plane_init(global_position_of_plane &ori){
 	ori.rotation_x = 0.0f; 
 	ori.rotation_y = 0.0f;
 	ori.rotation_z = 0.0f;
@@ -37,42 +40,65 @@ void orientation_init(orientation &ori){
 
 	ori.velocity = 5.0f;
 	ori.resitance = 0.0f;
-	ori.gravity = 9.81f;
+	ori.gravity = 9.0f;
 	ori.lift = 9.81f;
 	ori.time_of_last_loop = 0.0f;
 }
 
-void move(orientation &ori, float &axis, float direction){
+void move(global_position_of_plane &ori, float &axis, float direction){
 	axis += ori.time_of_last_loop * direction;
 }
 
-void getInput(GLFWwindow* &window, orientation &ori){
+void getInput(GLFWwindow* &window, global_position_of_plane &ori){
 
-	ori.resitance = 0.5f * 1.2754f * ori.velocity * ori.velocity * 1.0f * 0.4f;
+	ori.resitance = 0.5f * 1.2754f * ori.velocity * ori.velocity * 0.5f * 0.4f;
+
+	glm::vec3 combinded_vector_without_gravity = glm::vec3(0,ori.lift,ori.velocity - ori.resitance);
+	glm::vec3 without_gravity_and_rotated; 
+	glm::vec3 rotated_and_with_gravity;
+
+	without_gravity_and_rotated = glm::rotate(combinded_vector_without_gravity, 
+		float(ori.rotation_x * PI), glm::vec3(1,0,0));
+	without_gravity_and_rotated = glm::rotate(without_gravity_and_rotated, 
+		float(-ori.rotation_y * PI), glm::vec3(0,1,0));
+	without_gravity_and_rotated = glm::rotate(without_gravity_and_rotated, 
+		float(ori.rotation_z * PI), glm::vec3(0,0,1));
+
+	rotated_and_with_gravity.x = without_gravity_and_rotated.x;
+	rotated_and_with_gravity.y = without_gravity_and_rotated.y - ori.gravity;
+	rotated_and_with_gravity.z = without_gravity_and_rotated.z;
+
+	ori.position_x += ori.time_of_last_loop * rotated_and_with_gravity.x;
+	ori.position_y += ori.time_of_last_loop * rotated_and_with_gravity.y;
+	ori.position_z -= ori.time_of_last_loop * rotated_and_with_gravity.z;
+
+	cout << "x: " << rotated_and_with_gravity.x << " y: " << rotated_and_with_gravity.y <<
+		" z: " << rotated_and_with_gravity.z << endl;
+
 
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-		move(ori,ori.position_z, -1.0f);
+		move(ori,ori.rotation_x, 0.5f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-		move(ori,ori.position_z, 1.0f);
+		move(ori,ori.rotation_x, -0.5f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-		move(ori,ori.position_x, -1.0f);
+		move(ori,ori.rotation_z, -0.5f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-		move(ori,ori.position_x, 1.0f);
+		move(ori,ori.rotation_z, 0.5f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS){
-		move(ori,ori.position_y, -1.0f);
+		move(ori,ori.rotation_y, -0.5f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS){
-		move(ori,ori.position_y, 1.0f);
+		move(ori,ori.rotation_y, 0.5f);
 	}
 	
 

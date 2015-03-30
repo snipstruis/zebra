@@ -148,8 +148,8 @@ int main(int argc, char** argv){
 	float x=0;
 	cout<<INFO"entering main loop\n";
 	
-	orientation ori;
-	orientation_init(ori);
+	global_position_of_plane ori;
+	global_position_of_plane_init(ori);
 	
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 
@@ -181,12 +181,13 @@ int main(int argc, char** argv){
 		glfwSwapInterval(1);
 
 		for(int i = 0; i < locations_of_circles.size()/3; i++){
-			model =	glm::rotate(glm::mat4(),0.0f,
-								glm::normalize(vec3(1,1,0)))
-						* glm::translate(glm::mat4(),glm::vec3(	-ori.position_x + locations_of_circles[i*3],
-																 ori.position_y + locations_of_circles[i*3+1],
-																-ori.position_z + locations_of_circles[i*3+2]))
-						* glm::scale(mat4(),vec3(0.1,0.1,0.1));
+			model =			  glm::rotate(glm::mat4(),ori.rotation_x,glm::normalize(vec3(1,0,0)))
+					* model = glm::rotate(glm::mat4(),ori.rotation_y,glm::normalize(vec3(0,1,0)))
+					* model = glm::rotate(glm::mat4(),ori.rotation_z,glm::normalize(vec3(0,0,1)))
+					* glm::translate(glm::mat4(),glm::vec3(	-ori.position_x + locations_of_circles[i*3],
+															 ori.position_y + locations_of_circles[i*3+1],
+															-ori.position_z + locations_of_circles[i*3+2]))
+					* glm::scale(mat4(),vec3(0.1,0.1,0.1));
 	
 			uniform_set(modelview_uniform, model);
 			
