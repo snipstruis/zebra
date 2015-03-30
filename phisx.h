@@ -93,11 +93,11 @@ void getInput(GLFWwindow* &window, global_position_of_plane &ori){
 		move(ori,ori.rotation_z, 0.5f);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS){
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
 		move(ori,ori.rotation_y, -0.5f);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS){
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
 		move(ori,ori.rotation_y, 0.5f);
 	}
 	
