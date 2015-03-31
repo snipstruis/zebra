@@ -13,41 +13,31 @@ using namespace std;
 
 #define PI 3.14159265358979323846264338327950288419716939937510 
 
+float const drag_constant    = 0.127752;
+float const gravity_constant = 9.00;
+float const lift_constant    = 9.81;
+
 struct jet_t{
 	glm::quat rotation;
-
 	glm::vec3 position;
-
 	float velocity;
-	float resitance;
-	float gravity;
-	float lift;
-
 };
 
 void jet_init(jet_t &jet){
 	jet.rotation = glm::quat(1,0,0,0);
-
 	jet.position = glm::vec3(0.f,0.f,0.f);
-
 	jet.velocity = 5.0f;
-	jet.resitance = 0.0f;
-	jet.gravity = 9.0f;
-	jet.lift = 9.81f;
-
 }
 
 void getInput(GLFWwindow* &window, jet_t &jet,float time_of_last_loop){
 
-	jet.resitance = 0.5f * 1.2754f * jet.velocity * jet.velocity * 0.5f * 0.4f;
+	float resitance = drag_constant * jet.velocity * jet.velocity;
 
-	glm::vec3 combinded_vector_without_gravity = glm::vec3(0,jet.lift,jet.velocity - jet.resitance);
-	
-	glm::vec3 without_gravity_and_rotated = glm::mat3_cast(jet.rotation) * combinded_vector_without_gravity;
+	glm::vec3 combined_vector = glm::mat3_cast(jet.rotation) * glm::vec3(0,lift_constant ,jet.velocity - resitance);
 
-	jet.position.x += time_of_last_loop *  without_gravity_and_rotated.x;
-	jet.position.y += time_of_last_loop * (without_gravity_and_rotated.y - jet.gravity);
-	jet.position.z -= time_of_last_loop *  without_gravity_and_rotated.z;
+	jet.position.x += time_of_last_loop *  combined_vector.x;
+	jet.position.y += time_of_last_loop * (combined_vector.y - gravity_constant);
+	jet.position.z -= time_of_last_loop *  combined_vector.z;
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
 		jet.rotation = glm::rotate(jet.rotation, time_of_last_loop * 0.5f, glm::vec3(1,0,0));
@@ -89,4 +79,9 @@ void addCircleGrid(std::vector<float> &vec, int x_axis, int y_axis, int z_axis){
 		}
 	}
 }
+
+
+
+
+
 
