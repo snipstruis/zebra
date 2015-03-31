@@ -181,9 +181,7 @@ int main(int argc, char** argv){
 		glfwSwapInterval(1);
 
 		for(int i = 0; i < locations_of_circles.size()/3; i++){
-			model =			  glm::rotate(glm::mat4(),ori.rotation_x,glm::normalize(vec3(1,0,0)))
-					* model = glm::rotate(glm::mat4(),ori.rotation_y,glm::normalize(vec3(0,1,0)))
-					* model = glm::rotate(glm::mat4(),ori.rotation_z,glm::normalize(vec3(0,0,1)))
+			model =	glm::mat4_cast(ori.rotation)
 					* glm::translate(glm::mat4(),glm::vec3(	-ori.position.x + locations_of_circles[i*3],
 															 ori.position.y + locations_of_circles[i*3+1],
 															-ori.position.z + locations_of_circles[i*3+2]))
