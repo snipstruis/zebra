@@ -18,9 +18,7 @@ struct jet_t{
 	float rotation_y;
 	float rotation_z;
 
-	float position_x;
-	float position_y;
-	float position_z;
+	glm::vec3 position;
 
 	float velocity;
 	float resitance;
@@ -34,9 +32,9 @@ void jet_init(jet_t &jet){
 	jet.rotation_y = 0.0f;
 	jet.rotation_z = 0.0f;
 
-	jet.position_x = 0.0f;
-	jet.position_y = 0.0f;
-	jet.position_z = 0.0f;
+	jet.position.x = 0.0f;
+	jet.position.y = 0.0f;
+	jet.position.z = 0.0f;
 
 	jet.velocity = 5.0f;
 	jet.resitance = 0.0f;
@@ -64,9 +62,9 @@ void getInput(GLFWwindow* &window, jet_t &jet,float time_of_last_loop){
 	rotated_and_with_gravity.y = without_gravity_and_rotated.y - jet.gravity;
 	rotated_and_with_gravity.z = without_gravity_and_rotated.z;
 
-	jet.position_x += time_of_last_loop * rotated_and_with_gravity.x;
-	jet.position_y += time_of_last_loop * rotated_and_with_gravity.y;
-	jet.position_z -= time_of_last_loop * rotated_and_with_gravity.z;
+	jet.position.x += time_of_last_loop * rotated_and_with_gravity.x;
+	jet.position.y += time_of_last_loop * rotated_and_with_gravity.y;
+	jet.position.z -= time_of_last_loop * rotated_and_with_gravity.z;
 
 	cout << "x: " << rotated_and_with_gravity.x << " y: " << rotated_and_with_gravity.y <<
 		" z: " << rotated_and_with_gravity.z << endl;

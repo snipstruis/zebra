@@ -184,9 +184,9 @@ int main(int argc, char** argv){
 			model =			  glm::rotate(glm::mat4(),ori.rotation_x,glm::normalize(vec3(1,0,0)))
 					* model = glm::rotate(glm::mat4(),ori.rotation_y,glm::normalize(vec3(0,1,0)))
 					* model = glm::rotate(glm::mat4(),ori.rotation_z,glm::normalize(vec3(0,0,1)))
-					* glm::translate(glm::mat4(),glm::vec3(	-ori.position_x + locations_of_circles[i*3],
-															 ori.position_y + locations_of_circles[i*3+1],
-															-ori.position_z + locations_of_circles[i*3+2]))
+					* glm::translate(glm::mat4(),glm::vec3(	-ori.position.x + locations_of_circles[i*3],
+															 ori.position.y + locations_of_circles[i*3+1],
+															-ori.position.z + locations_of_circles[i*3+2]))
 					* glm::scale(mat4(),vec3(0.1,0.1,0.1));
 	
 			uniform_set(modelview_uniform, model);
