@@ -173,11 +173,11 @@ int main(int argc, char** argv){
 
 		auto current = high_resolution_clock::now();
 		auto elapsed = duration_cast<microseconds>(current-previous);
-		ori.time_of_last_loop = elapsed.count() / 1000000.0f;
+		auto time_of_last_loop = elapsed.count() / 1000000.0f;
 		previous = current;
 
 		glfwPollEvents();
-		getInput(window, ori);
+		getInput(window, time_of_last_loop, ori);
 		glfwSwapInterval(1);
 
 		for(int i = 0; i < locations_of_circles.size()/3; i++){

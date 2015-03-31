@@ -49,7 +49,7 @@ void move(global_position_of_plane &ori, float &axis, float direction){
 	axis += ori.time_of_last_loop * direction;
 }
 
-void getInput(GLFWwindow* &window, global_position_of_plane &ori){
+void getInput(GLFWwindow* &window, float time_of_last_loop, global_position_of_plane &ori){
 
 	ori.resitance = 0.5f * 1.2754f * ori.velocity * ori.velocity * 0.5f * 0.4f;
 
@@ -75,30 +75,28 @@ void getInput(GLFWwindow* &window, global_position_of_plane &ori){
 	cout << "x: " << rotated_and_with_gravity.x << " y: " << rotated_and_with_gravity.y <<
 		" z: " << rotated_and_with_gravity.z << endl;
 
-
-
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-		move(ori,ori.rotation_x, 0.5f);
+		ori.rotation_x += time_of_last_loop * 0.5f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-		move(ori,ori.rotation_x, -0.5f);
+		ori.rotation_x += time_of_last_loop * -0.5f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-		move(ori,ori.rotation_z, -0.5f);
+		ori.rotation_z += time_of_last_loop * -0.5f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-		move(ori,ori.rotation_z, 0.5f);
+		ori.rotation_z += time_of_last_loop * 0.5f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-		move(ori,ori.rotation_y, -0.5f);
+		ori.rotation_y += time_of_last_loop * -0.5f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
-		move(ori,ori.rotation_y, 0.5f);
+		ori.rotation_y += time_of_last_loop * 0.5f;
 	}
 	
 
