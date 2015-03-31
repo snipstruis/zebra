@@ -14,7 +14,7 @@ using namespace std;
 #define PI 3.14159265358979323846264338327950288419716939937510 
 
 struct jet_t{
-glm::quat rotation;
+	glm::quat rotation;
 
 	glm::vec3 position;
 
@@ -43,7 +43,7 @@ void getInput(GLFWwindow* &window, jet_t &jet,float time_of_last_loop){
 
 	glm::vec3 combinded_vector_without_gravity = glm::vec3(0,jet.lift,jet.velocity - jet.resitance);
 	
-glm::vec3 without_gravity_and_rotated = glm::mat3_cast(jet.rotation) * combinded_vector_without_gravity;
+	glm::vec3 without_gravity_and_rotated = glm::mat3_cast(jet.rotation) * combinded_vector_without_gravity;
 
 	jet.position.x += time_of_last_loop *  without_gravity_and_rotated.x;
 	jet.position.y += time_of_last_loop * (without_gravity_and_rotated.y - jet.gravity);
