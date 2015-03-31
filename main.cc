@@ -148,8 +148,8 @@ int main(int argc, char** argv){
 	float x=0;
 	cout<<INFO"entering main loop\n";
 	
-	global_position_of_plane ori;
-	global_position_of_plane_init(ori);
+	jet_t ori;
+	jet_init(ori);
 	
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 
@@ -177,7 +177,7 @@ int main(int argc, char** argv){
 		previous = current;
 
 		glfwPollEvents();
-		getInput(window, time_of_last_loop, ori);
+		getInput(window, ori, time_of_last_loop);
 		glfwSwapInterval(1);
 
 		for(int i = 0; i < locations_of_circles.size()/3; i++){
