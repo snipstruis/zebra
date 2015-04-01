@@ -32,8 +32,11 @@ void jet_init(jet_t &jet){
 void getInput(GLFWwindow* &window, jet_t &jet,float time_of_last_loop){
 
 	float resitance = drag_constant * jet.velocity * jet.velocity;
+	
+	glm::quat rotation_vector = jet.rotation;
+	rotation_vector.z *= -1.f; 
 
-	glm::vec3 combined_vector = glm::mat3_cast(jet.rotation) * glm::vec3(0,lift_constant ,jet.velocity - resitance);
+	glm::vec3 combined_vector = glm::mat3_cast(rotation_vector) * glm::vec3(0,lift_constant ,jet.velocity - resitance);
 
 	jet.position.x += time_of_last_loop *  combined_vector.x;
 	jet.position.y += time_of_last_loop * (combined_vector.y - gravity_constant);
@@ -56,11 +59,11 @@ void getInput(GLFWwindow* &window, jet_t &jet,float time_of_last_loop){
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-		jet.rotation = glm::rotate(jet.rotation, time_of_last_loop * -0.5f, glm::vec3(0,1,0));
+		jet.rotation = glm::rotate(jet.rotation, time_of_last_loop * 0.5f, glm::vec3(0,1,0));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
-		jet.rotation = glm::rotate(jet.rotation, time_of_last_loop * 0.5f, glm::vec3(0,1,0));
+		jet.rotation = glm::rotate(jet.rotation, time_of_last_loop * -0.5f, glm::vec3(0,1,0));
 	}
 }
 
