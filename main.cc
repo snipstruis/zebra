@@ -185,7 +185,8 @@ int main(int argc, char** argv){
 					* glm::translate(glm::mat4(),glm::vec3(	-ori.position.x + locations_of_circles[i*3],
 															 ori.position.y + locations_of_circles[i*3+1],
 															-ori.position.z + locations_of_circles[i*3+2]))
-					* glm::scale(mat4(),vec3(0.1,0.1,0.1));
+					* glm::scale(mat4(),vec3(0.1,0.1,0.1))
+					* glm::translate(glm::mat4(),ori.origin);
 	
 			uniform_set(modelview_uniform, model);
 			
