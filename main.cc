@@ -14,6 +14,8 @@ using namespace std;
 using namespace glm;
 using namespace std::chrono;
 
+GLint projection_uniform = 0;
+
 GLFWwindow* createWindow(ivec2 windowsize){
 	GLFWwindow* window;
 	// create window with an OpenGL 3.1 context
@@ -25,27 +27,33 @@ GLFWwindow* createWindow(ivec2 windowsize){
 	if (!window){
 		cout<<FAIL"GLFW failed to create a window\n";
 		glfwTerminate();
-		exit(EXIT_FAILURE); }
-		else cout<<OK"GLFW window created"<<endl;
-		// assign context to current thread
-		glfwMakeContextCurrent(window);
-		return window;
+		exit(EXIT_FAILURE);
 	}
+	else cout<<OK"GLFW window created"<<endl;
+	// assign context to current thread
+	glfwMakeContextCurrent(window);
+	return window;
+}
 
-	void uniform_set(GLint loc, glm::mat4 data){
-		float array[16] = {
-			data[0][0],data[0][1],data[0][2],data[0][3],
-			data[1][0],data[1][1],data[1][2],data[1][3],
-			data[2][0],data[2][1],data[2][2],data[2][3],
-			data[3][0],data[3][1],data[3][2],data[3][3]
-		};
+void uniform_set(GLint loc, glm::mat4 data){
+	float array[16] = {
+		data[0][0],data[0][1],data[0][2],data[0][3],
+		data[1][0],data[1][1],data[1][2],data[1][3],
+		data[2][0],data[2][1],data[2][2],data[2][3],
+		data[3][0],data[3][1],data[3][2],data[3][3]
+	};
+	glUniformMatrix4fv(loc,1,false,array);
+}
 
-		glUniformMatrix4fv(loc,1,false,array);
-	}
+void uniform_set(GLint loc,glm::vec3 data){
+	glUniform3f(loc,data.x,data.y,data.z);
+}
 
-	void uniform_set(GLint loc,glm::vec3 data){
-		glUniform3f(loc,data.x,data.y,data.z);
-	}
+void framebuffer_size_callback(GLFWwindow* window, int width,int height){
+	glViewport(0, 0, width, height);
+	if(projection_uniform!=0)
+		uniform_set(projection_uniform, glm::perspective(1.f,float(width)/float(height),0.1f,1000.f));
+}
 
 int main(int argc, char** argv){
 	if(argc!=3){
@@ -69,6 +77,8 @@ int main(int argc, char** argv){
 		exit(EXIT_FAILURE);
 	} else cout<<OK"GLEW initialized\n";
 	
+	glfwSetFramebufferSizeCallback(window,framebuffer_size_callback);
+
 	// set GL states
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -120,15 +130,14 @@ int main(int argc, char** argv){
 		"failed to find uniform \"modelview\" in shader program\n";
 	}else cout<<OK"found uniform \"modelview\"\n";
 	// set projection matrix
-	GLint projection_uniform = glGetUniformLocation(program,"projection");
+	projection_uniform = glGetUniformLocation(program,"projection");
 	if(projection_uniform==-1){
 		std::cout<<FAIL
 		"failed to find uniform \"projection\" in shader program\n";
 	}else cout<<OK"found uniform \"projection\"\n";
 	
-	uniform_set(projection_uniform, glm::perspective(1.f,4.f/3.f,0.1f,100.f));
+	uniform_set(projection_uniform, glm::perspective(1.f,4.f/3.f,0.1f,1000.f));
 	object o = create_object( vertices, indices );
-	uniform_set(projection_uniform, glm::perspective(1.f,4.f/3.f,0.1f,100.f));
 	object g = create_object( vertices, indices );
 	
 	float x=0;
